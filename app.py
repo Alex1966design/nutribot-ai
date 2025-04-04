@@ -1,45 +1,21 @@
-import os
-from langchain_community.document_loaders import TextLoader, DirectoryLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
-from langchain_chroma import Chroma
-from langchain.chains import RetrievalQA
-from langchain_openai import ChatOpenAI
+import streamlit as st
+from utils import load_vectorstore, get_answer
 
+st.set_page_config(page_title="NutriBot — ЗОЖ ассистент", page_icon="🥦")
 
-def load_vectorstore():
-    print("Загружаю векторную базу...")
+st.title("🥦 NutriBot: ИИ-консультант по здоровому питанию")
+st.markdown("Задай любой вопрос по ЗОЖ и получи полезный совет!")
 
-    # Загрузка Markdown-файлов из папки data/
-    text_loader_kwargs = {'autodetect_encoding': True}
-    loader = DirectoryLoader("data", glob="**/*.md", loader_cls=TextLoader, loader_kwargs=text_loader_kwargs)
-    documents = loader.load()
+@st.cache_resource
+def get_retriever():
+    return load_vectorstore()
 
-    # Разбиение текста на чанки
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=800,
-        chunk_overlap=100,
-        separators=["\n\n", "\n", "(?<=\. )"]
-    )
-    splitted_texts = splitter.split_documents(documents)
+retriever = get_retriever()
 
-    # Создание эмбеддингов и векторной базы в памяти
-    embedding = OpenAIEmbeddings()
-    vectordb = Chroma.from_documents(
-        documents=splitted_texts,
-        embedding=embedding
-        # persist_directory не указываем — работаем в in-memory
-    )
+question = st.text_input("Введите ваш вопрос:", placeholder="Например: Какие продукты полезны для сердца?")
 
-    # Возвращаем retriever для поиска по базе
-    return vectordb.as_retriever()
-
-
-def get_answer(retriever, question):
-    # Создание модели и цепочки RetrievalQA
-    llm = ChatOpenAI(model="gpt-4o", temperature=0.7)
-    qa_chain = RetrievalQA.from_chain_type(llm=llm, retriever=retriever)
-
-    # Генерация ответа на вопрос
-    return qa_chain.run(question)
-# версия от 2024-04-03
+if st.button("Получить ответ") and question:
+    with st.spinner("Генерируем ответ..."):
+        answer = get_answer(question, retriever)
+        st.success("✅ Ответ:")
+        st.markdown(answer)

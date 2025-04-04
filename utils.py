@@ -7,11 +7,9 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_chroma import Chroma
 from langchain.chains import RetrievalQA
 
-# Пути к данным и базе
 DATA_PATH = "data/zdorovoe_info.md"
 DB_DIR = "vector_db"
 
-# Загрузка или создание векторной базы
 def load_vectorstore():
     if not os.path.exists(DB_DIR) or not os.listdir(DB_DIR):
         print("Создаю новую векторную базу...")
@@ -27,7 +25,7 @@ def load_vectorstore():
 
         embedding = OpenAIEmbeddings(api_key=st.secrets["OPENAI_API_KEY"])
         vectordb = Chroma.from_documents(docs, embedding=embedding, persist_directory=DB_DIR)
-
+        vectordb.persist()
     else:
         print("Загружаю существующую векторную базу...")
         embedding = OpenAIEmbeddings(api_key=st.secrets["OPENAI_API_KEY"])
@@ -35,7 +33,6 @@ def load_vectorstore():
 
     return vectordb.as_retriever()
 
-# Получение ответа на вопрос
 def get_answer(question, retriever):
     qa_chain = RetrievalQA.from_chain_type(
         llm=ChatOpenAI(model="gpt-4o", temperature=0.5, api_key=st.secrets["OPENAI_API_KEY"]),

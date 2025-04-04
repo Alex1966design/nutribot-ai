@@ -1,8 +1,9 @@
 streamlit
+openai
 langchain
 langchain-community
+langchain-core
 langchain-openai
 langchain-chroma
-chromadb
 tiktoken
-openai
+chromadb
