@@ -1,0 +1,16 @@
+# Игнорируем виртуальное окружение
+.venv/
+venv/
+
+# Игнорируем секреты
+.streamlit/secrets.toml
+
+# Игнорируем базу данных
+vector_db/
+
+# Служебные файлы IDE
+__pycache__/
+*.pyc
+*.pyo
+*.log
+*.idea/
