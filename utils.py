@@ -1,29 +1,23 @@
 import os
-from langchain.vectorstores.faiss import FAISS
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.document_loaders import TextLoader
-from langchain.chains import RetrievalQA
-from langchain.chat_models import ChatOpenAI
-from langchain_core.documents import Document
 import streamlit as st
+from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_community.document_loaders import TextLoader
+from langchain_community.llms import OpenAI
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.chains import RetrievalQA
 
-
-@st.cache_resource
 def load_vectorstore():
+    persist_path = "vector_db"
     embedding = OpenAIEmbeddings(api_key=st.secrets["OPENAI_API_KEY"])
-    persist_path = "vector_db_faiss"
-    if os.path.exists(persist_path):
-        return FAISS.load_local(persist_path, embedding)
-    else:
-        raise ValueError(f"Векторная база данных FAISS не найдена по пути: {persist_path}")
+    return FAISS.load_local(persist_path, embedding, allow_dangerous_deserialization=True)
 
-
-def get_answer(question: str):
-    embedding = OpenAIEmbeddings(api_key=st.secrets["OPENAI_API_KEY"])
-    vectorstore = load_vectorstore()
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", api_key=st.secrets["OPENAI_API_KEY"])
-    qa_chain = RetrievalQA.from_chain_type(llm=llm, retriever=retriever)
+def get_answer(question):
+    retriever = load_vectorstore().as_retriever(search_kwargs={"k": 3})
+    qa_chain = RetrievalQA.from_chain_type(
+        llm=OpenAI(api_key=st.secrets["OPENAI_API_KEY"]),
+        chain_type="stuff",
+        retriever=retriever,
+        return_source_documents=False,
+    )
     return qa_chain.run(question)

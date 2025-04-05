@@ -5,11 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b54a2d26-c8b2-4a3d-8f9c-909f9bd5ed46" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.streamlit/secrets.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/create_vectorstore.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vector_db_faiss/create_vectorstore.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.streamlit/config.toml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vector_db/chroma.sqlite3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vector_db/f0129b61-dc13-4fc7-99e5-51a73e621c2a/data_level0.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vector_db/f0129b61-dc13-4fc7-99e5-51a73e621c2a/header.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vector_db/f0129b61-dc13-4fc7-99e5-51a73e621c2a/length.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vector_db/f0129b61-dc13-4fc7-99e5-51a73e621c2a/link_lists.bin" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,15 +41,38 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.test_utils.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.create_vectorstore.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test_utils.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;
   }
-}]]></component>
-  <component name="RunManager">
+}</component>
+  <component name="RunManager" selected="Python.create_vectorstore">
+    <configuration name="create_vectorstore" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="PythonProject10_Nutribot_ai_vector" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/create_vectorstore.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="test_utils" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="PythonProject10_Nutribot_ai_vector" />
       <option name="ENV_FILES" value="" />
@@ -68,6 +97,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.create_vectorstore" />
         <item itemvalue="Python.test_utils" />
       </list>
     </recent_temporary>
