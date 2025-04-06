@@ -1,30 +1,36 @@
-def get_answer(question, retriever):
-    # Здесь используется retriever для поиска информации по вопросу
-    result = retriever.get_relevant_documents(question)
-    answer = result[0]["text"] if result else "Ответ не найден."
-    return answer
-import os
-import streamlit as st
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_community.document_loaders import TextLoader
-from langchain_community.llms import OpenAI
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.chains import RetrievalQA
+import streamlit as st
+from langchain.chains.question_answering import load_qa_chain
+from langchain_community.chat_models import ChatOpenAI
+
 
 def load_vectorstore():
+    """
+    Загружает локальную векторную базу из папки "vector_db" с использованием эмбеддингов OpenAI.
+    """
     persist_path = "vector_db"
+    # Получаем эмбеддинги с ключом из секретов Streamlit
     embedding = OpenAIEmbeddings(api_key=st.secrets["OPENAI_API_KEY"])
+    # Загружаем векторное хранилище, разрешая опасную десериализацию (убедитесь, что вы доверяете данным)
     return FAISS.load_local(persist_path, embedding, allow_dangerous_deserialization=True)
 
-    from langchain.chains.question_answering import load_qa_chain
-    from langchain_community.chat_models import ChatOpenAI
 
-    def get_answer(question, retriever):
-        llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.2)
-        chain = load_qa_chain(llm, chain_type="stuff")
-        docs = retriever.get_relevant_documents(question)
-        return chain.run(input_documents=docs, question=question)
+def get_answer(question):
+    """
+    Принимает вопрос и генерирует ответ, используя цепочку вопрос-ответ.
+    """
+    # Получаем извлекатель (retriever) из векторного хранилища
+    retriever = load_vectorstore().as_retriever(search_kwargs={"k": 3})
 
-    )
-    return qa_chain.run(question)
+    # Создаем цепочку вопрос-ответ с использованием модели ChatOpenAI
+    chain = load_qa_chain(ChatOpenAI(temperature=0), chain_type="stuff")
+
+    # Получаем документы, релевантные вопросу
+    docs = retriever.get_relevant_documents(question)
+
+    # Генерируем ответ с помощью цепочки
+    answer = chain.run(input_documents=docs, question=question)
+    return answer
