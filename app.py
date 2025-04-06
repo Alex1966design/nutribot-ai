@@ -1,4 +1,12 @@
 import streamlit as st
+
+# Кнопка для сброса кэша
+if st.button("Очистить кэш"):
+    st.cache_resource.clear()
+    st.experimental_memo.clear()
+    st.success("Кэш очищен!")
+
+import streamlit as st
 from utils import load_vectorstore, get_answer
 
 # Загружаем векторную базу один раз и кэшируем результат
