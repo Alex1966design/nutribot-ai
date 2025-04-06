@@ -1,10 +1,10 @@
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import OpenAIEmbeddings
-from langchain_community.document_loaders import TextLoader
+from langchain_openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import streamlit as st
 from langchain.chains.question_answering import load_qa_chain
-from langchain_community.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
+import os
 
 
 def load_vectorstore():
@@ -12,25 +12,37 @@ def load_vectorstore():
     Загружает локальную векторную базу из папки "vector_db" с использованием эмбеддингов OpenAI.
     """
     persist_path = "vector_db"
-    # Получаем эмбеддинги с ключом из секретов Streamlit
-    embedding = OpenAIEmbeddings(api_key=st.secrets["OPENAI_API_KEY"])
-    # Загружаем векторное хранилище, разрешая опасную десериализацию (убедитесь, что вы доверяете данным)
+    # Получаем API ключ OpenAI из переменных окружения или секретов Streamlit
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key and hasattr(st, "secrets") and "OPENAI_API_KEY" in st.secrets:
+        api_key = st.secrets["OPENAI_API_KEY"]
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY не найден ни в переменных окружения, ни в секретах Streamlit")
+
+    # Создаем эмбеддинги с использованием корректного параметра
+    embedding = OpenAIEmbeddings(openai_api_key=api_key)
+
+    # Загружаем векторное хранилище, разрешая опасную десериализацию (убедитесь, что данные доверенные)
     return FAISS.load_local(persist_path, embedding, allow_dangerous_deserialization=True)
 
 
-def get_answer(question):
+def get_answer(question, retriever):
     """
-    Принимает вопрос и генерирует ответ, используя цепочку вопрос-ответ.
+    Принимает вопрос и извлекатель retriever, генерирует ответ с помощью цепочки вопрос-ответ.
     """
-    # Получаем извлекатель (retriever) из векторного хранилища
-    retriever = load_vectorstore().as_retriever(search_kwargs={"k": 3})
-
-    # Создаем цепочку вопрос-ответ с использованием модели ChatOpenAI
-    chain = load_qa_chain(ChatOpenAI(temperature=0), chain_type="stuff")
-
-    # Получаем документы, релевантные вопросу
+    # Получаем документы, релевантные заданному вопросу
     docs = retriever.get_relevant_documents(question)
 
-    # Генерируем ответ с помощью цепочки
+    # Получаем API ключ для ChatOpenAI
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key and hasattr(st, "secrets") and "OPENAI_API_KEY" in st.secrets:
+        api_key = st.secrets["OPENAI_API_KEY"]
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY не найден ни в переменных окружения, ни в секретах Streamlit")
+
+    # Создаем цепочку вопрос-ответ с использованием модели ChatOpenAI
+    chain = load_qa_chain(ChatOpenAI(temperature=0, openai_api_key=api_key), chain_type="stuff")
+
+    # Генерируем ответ
     answer = chain.run(input_documents=docs, question=question)
     return answer
