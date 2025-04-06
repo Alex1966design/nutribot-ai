@@ -1,45 +1,30 @@
-# utils.py
-
-import os
-from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain_chroma import Chroma
-from langchain.chains import RetrievalQA
-import streamlit as st
-
-# Пути к данным и базе
-DATA_PATH = "data/zdorovoe_info.md"
-DB_DIR = "vector_db"
-
-# Загрузка или создание векторной базы
-def load_vectorstore():
-    if not os.path.exists(DB_DIR) or not os.listdir(DB_DIR):
-        print("Создаю новую векторную базу...")
-        loader = TextLoader(DATA_PATH, encoding="utf-8")
-        documents = loader.load()
-
-        splitter = RecursiveCharacterTextSplitter(
-            chunk_size=500,
-            chunk_overlap=100,
-            separators=["\n\n", "\n", ". "]
-        )
-        docs = splitter.split_documents(documents)
-
-        embedding = OpenAIEmbeddings(api_key=st.secrets["OPENAI_API_KEY"])
-        vectordb = Chroma.from_documents(docs, embedding=embedding, persist_directory=DB_DIR)
-    else:
-        print("Загружаю существующую векторную базу...")
-        embedding = OpenAIEmbeddings(api_key=st.secrets["OPENAI_API_KEY"])
-        vectordb = Chroma(persist_directory=DB_DIR, embedding_function=embedding)
-
-    return vectordb.as_retriever()
-
-# Получение ответа
 def get_answer(question, retriever):
-    qa_chain = RetrievalQA.from_chain_type(
-        llm=ChatOpenAI(model="gpt-4o", temperature=0.5),
-        retriever=retriever,
-        return_source_documents=False
+    # Здесь используется retriever для поиска информации по вопросу
+    result = retriever.get_relevant_documents(question)
+    answer = result[0]["text"] if result else "Ответ не найден."
+    return answer
+import os
+import streamlit as st
+from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_community.document_loaders import TextLoader
+from langchain_community.llms import OpenAI
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.chains import RetrievalQA
+
+def load_vectorstore():
+    persist_path = "vector_db"
+    embedding = OpenAIEmbeddings(api_key=st.secrets["OPENAI_API_KEY"])
+    return FAISS.load_local(persist_path, embedding, allow_dangerous_deserialization=True)
+
+    from langchain.chains.question_answering import load_qa_chain
+    from langchain_community.chat_models import ChatOpenAI
+
+    def get_answer(question, retriever):
+        llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.2)
+        chain = load_qa_chain(llm, chain_type="stuff")
+        docs = retriever.get_relevant_documents(question)
+        return chain.run(input_documents=docs, question=question)
+
     )
     return qa_chain.run(question)
