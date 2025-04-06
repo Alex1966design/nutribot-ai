@@ -1,4 +1,21 @@
 import streamlit as st
+from utils import get_answer, get_retriever
+
+# Заголовок
+st.title("NutriBot: ИИ-консультант по здоровому питанию")
+st.write("Задай любой вопрос по ЗОЖ и получи полезный совет!")
+
+# Ввод вопроса
+question = st.text_input("Введите ваш вопрос:", placeholder="Например: Какие продукты полезны для сердца?")
+
+# Обработчик нажатия кнопки
+if st.button("Получить ответ") and question:
+    with st.spinner("Генерируем ответ..."):
+        retriever = get_retriever()  # получаем retriever (загружаем векторную базу)
+        answer = get_answer(question, retriever)  # передаем оба параметра
+        st.success("✅ Ответ:")
+        st.markdown(answer)
+import streamlit as st
 from utils import get_answer
 
 # Заголовок приложения
@@ -16,10 +33,3 @@ if st.button("Получить ответ") and question:
     st.success("✅ Ответ:")
     st.markdown(answer)
 
-# minor update to trigger redeploy
-
-import streamlit as st
-
-st.set_page_config(page_title="NutriBot", page_icon="🥦")
-st.title("🥦 NutriBot: Здоровое питание")
-st.write("Привет! Это тестовая версия приложения.")
